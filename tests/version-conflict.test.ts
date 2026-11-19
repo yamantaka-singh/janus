@@ -6,7 +6,7 @@ import path from "path";
 describe("Version Conflict & Dependency Integrity", () => {
   it("enforces exact locked major dependencies without unexpected drift", () => {
     const deps = packageJson.dependencies as Record<string, string>;
-    expect(deps["next"]).toBe("16.3.6");
+    expect(deps["next"]).toBe("16.4.6");
     expect(deps["react"]).toBe("19.3.0");
     expect(deps["@supabase/supabase-js"]).toBe("^2.117.1");
     expect(deps["zustand"]).toBe("^5.0.15");
