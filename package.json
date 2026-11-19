@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:worker": "opennextjs-cloudflare build",
+    "preview:worker": "opennextjs-cloudflare build && wrangler dev",
     "start": "next start",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
@@ -35,7 +37,7 @@
     "http-status-codes": "^2.3.0",
     "lru-cache": "^11.5.3",
     "lucide-react": "^1.48.0",
-    "next": "16.3.6",
+    "next": "16.4.6",
     "p-retry": "^8.0.1",
     "radix-ui": "^1.6.7",
     "react": "19.3.0",
@@ -51,6 +53,7 @@
     "zustand": "^5.0.15"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "^1.20.17",
     "@tailwindcss/postcss": "^4.3.3",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
@@ -63,6 +66,7 @@
     "tailwindcss": "^4.3.3",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
-    "vitest": "^5.0.1"
+    "vitest": "^5.0.1",
+    "wrangler": "^4.165.0"
   }
 }
