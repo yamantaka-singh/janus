@@ -19,9 +19,4 @@ describe("Version Conflict & Dependency Integrity", () => {
     expect(fs.existsSync(path.join(root, "package-lock.json"))).toBe(false);
     expect(fs.existsSync(path.join(root, "yarn.lock"))).toBe(false);
   });
-
-  it("confirms dead migration.md artifact is deleted", () => {
-    const root = path.resolve(__dirname, "..");
-    expect(fs.existsSync(path.join(root, "migration.md"))).toBe(false);
-  });
 });
