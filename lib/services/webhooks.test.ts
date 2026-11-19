@@ -102,7 +102,10 @@ describe("Decoupled & Replay-Protected Webhook Dispatcher", () => {
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             single: vi.fn().mockResolvedValue({
-              data: { webhook_url: "http://169.254.169.254/latest/meta-data/", webhook_secret: "sec" },
+              data: {
+                webhook_url: "http://169.254.169.254/latest/meta-data/",
+                webhook_secret: "sec",
+              },
             }),
           }),
         }),
@@ -123,7 +126,7 @@ describe("Decoupled & Replay-Protected Webhook Dispatcher", () => {
   it("validates webhook URLs comprehensively against SSRF evasions", () => {
     expect(isValidWebhookUrl("https://valid.example.com/webhook")).toBe(true);
     expect(isValidWebhookUrl("http://valid.example.com:8080/webhook")).toBe(true);
-    
+
     // SSRF vectors
     expect(isValidWebhookUrl("http://169.254.169.254/latest/meta-data")).toBe(false);
     expect(isValidWebhookUrl("http://169.254.1.2/secret")).toBe(false);

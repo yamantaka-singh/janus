@@ -42,7 +42,8 @@ export async function recognizePlate(
   const baseUrl = config?.baseUrl || process.env.ARGUS_API_URL || "http://127.0.0.1:8000";
   const apiKey = config?.apiKey || process.env.ARGUS_API_KEY;
   const accessClientId = config?.accessClientId || process.env.CLOUDFLARE_ACCESS_CLIENT_ID;
-  const accessClientSecret = config?.accessClientSecret || process.env.CLOUDFLARE_ACCESS_CLIENT_SECRET;
+  const accessClientSecret =
+    config?.accessClientSecret || process.env.CLOUDFLARE_ACCESS_CLIENT_SECRET;
   const timeoutMs = config?.timeoutMs ?? 10000;
 
   const endpoint = `${baseUrl.replace(/\/+$/, "")}/recognize`;
@@ -85,7 +86,10 @@ export async function recognizePlate(
       const errorJson = await response.json();
       if (errorJson && typeof errorJson === "object") {
         errorDetails = errorJson;
-        if ("message" in errorJson && typeof (errorJson as { message: unknown }).message === "string") {
+        if (
+          "message" in errorJson &&
+          typeof (errorJson as { message: unknown }).message === "string"
+        ) {
           errorMessage = (errorJson as { message: string }).message;
         }
       }

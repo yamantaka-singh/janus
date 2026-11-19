@@ -103,7 +103,9 @@ describe("ANPR Client Service", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     await expect(recognizePlate(Buffer.from("image"))).rejects.toThrow(AnprServiceError);
-    await expect(recognizePlate(Buffer.from("image"))).rejects.toThrow(/Invalid or missing API key/);
+    await expect(recognizePlate(Buffer.from("image"))).rejects.toThrow(
+      /Invalid or missing API key/,
+    );
   });
 
   it("handles non-JSON error response from Cloudflare edge gracefully", async () => {

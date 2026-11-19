@@ -40,10 +40,7 @@ export const DEFAULT_CAMERA_CROPS: CameraCropConfig[] = [
  * @param _crop  - Camera crop configuration
  * @returns Image buffer
  */
-export async function cropImageBuffer(
-  buffer: Buffer,
-  _crop: CameraCropConfig,
-): Promise<Buffer> {
+export async function cropImageBuffer(buffer: Buffer, _crop: CameraCropConfig): Promise<Buffer> {
   return buffer;
 }
 
