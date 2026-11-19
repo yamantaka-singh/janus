@@ -6,3 +6,5 @@
 export * from "./common";
 export * from "./scoping";
 export * from "./entries";
+export * from "./anpr-client";
+export * from "./image-processor";
