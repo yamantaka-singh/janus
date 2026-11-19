@@ -47,6 +47,23 @@ pnpm build
 pnpm start
 ```
 
+### Cloudflare Workers Deployment
+
+Janus is configured for serverless deployment on Cloudflare Workers via `@opennextjs/cloudflare`:
+
+```bash
+# Build worker bundle (.open-next)
+pnpm build:worker
+
+# Preview inside local workerd emulator
+pnpm preview:worker
+
+# Deploy to Cloudflare Workers
+pnpm wrangler deploy
+```
+
+See [docs/cloudflare-deployment.md](docs/cloudflare-deployment.md) for full configuration, environment variables, and edge architecture details.
+
 ---
 
 ## 3. How to Seed Data for a New Client
