@@ -20,6 +20,7 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
+// @ts-expect-error Optional CLI dependency
 import sharp from "sharp";
 
 // ---------------------------------------------------------------------------

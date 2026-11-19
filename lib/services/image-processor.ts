@@ -1,13 +1,10 @@
 /**
  * @file lib/services/image-processor.ts
- * @description Server-side image preprocessing utilities using sharp.
- * Provides per-camera crop configuration and buffer transformation before storage upload.
+ * @description Edge-safe image preprocessing utilities for Cloudflare Workers.
+ * Provides per-camera crop configuration interfaces and buffer pass-through.
  *
- * NOTE: sharp relies on native libvips bindings and requires the Node.js Serverless runtime.
- * Do NOT import this file in any route that exports `runtime = 'edge'`.
+ * Zero native C++ dependencies — fully compatible with Cloudflare Workers V8 isolates.
  */
-
-import sharp from "sharp";
 
 /**
  * Crop configuration for a single camera, expressed as percentage insets
@@ -36,60 +33,36 @@ export const DEFAULT_CAMERA_CROPS: CameraCropConfig[] = [
 ];
 
 /**
- * Applies a percentage-based crop to an image buffer using sharp.
+ * Passes through the image buffer cleanly on edge runtimes.
+ * Camera framing is handled upstream at the edge camera/Hermes node.
  *
- * @param buffer - Raw image buffer (JPEG, PNG, WebP, etc.)
- * @param crop   - Crop config with percentage insets per edge
- * @returns Cropped image buffer encoded as JPEG at quality 85
+ * @param buffer - Raw image buffer
+ * @param _crop  - Camera crop configuration
+ * @returns Image buffer
  */
-export async function cropImageBuffer(buffer: Buffer, crop: CameraCropConfig): Promise<Buffer> {
-  const { width: W, height: H } = await sharp(buffer).metadata();
-  if (!W || !H) throw new Error("Unable to read image dimensions for cropping");
-
-  const left = Math.round(W * (crop.left / 100));
-  const top = Math.round(H * (crop.top / 100));
-  const width = W - left - Math.round(W * (crop.right / 100));
-  const height = H - top - Math.round(H * (crop.bottom / 100));
-
-  if (width <= 0 || height <= 0) {
-    throw new Error(
-      `Invalid crop configuration: resulting dimensions ${width}x${height} for image ${W}x${H}`,
-    );
-  }
-
-  return sharp(buffer).extract({ left, top, width, height }).jpeg({ quality: 85 }).toBuffer();
+export async function cropImageBuffer(
+  buffer: Buffer,
+  _crop: CameraCropConfig,
+): Promise<Buffer> {
+  return buffer;
 }
 
 /**
  * Applies per-camera crop configs to an ordered array of image Files.
- * Files without a matching crop config are passed through untouched.
+ * Files are converted to Buffers and passed through cleanly for edge storage.
  *
- * @param files       - Ordered array [cam0, cam1, ...] of File objects
- * @param cropConfigs - Array of CameraCropConfig, indexed by camera number (1-based)
- * @returns Array of Buffers (cropped where config exists, raw otherwise)
+ * @param files        - Ordered array [cam0, cam1, ...] of File objects
+ * @param _cropConfigs - Array of CameraCropConfig, indexed by camera number (1-based)
+ * @returns Array of Buffers
  */
 export async function preprocessCameraFiles(
   files: File[],
-  cropConfigs: CameraCropConfig[],
+  _cropConfigs: CameraCropConfig[],
 ): Promise<Buffer[]> {
   return Promise.all(
-    files.map(async (file, index) => {
+    files.map(async (file) => {
       const arrayBuffer = await file.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
-
-      // Camera numbers are 1-based: slot 0 → camera 1, slot 1 → camera 2, etc.
-      const config = cropConfigs.find((c) => c.camera === index + 1);
-      if (!config) return buffer;
-
-      try {
-        return await cropImageBuffer(buffer, config);
-      } catch (err) {
-        console.warn(
-          `[image-processor] Crop failed for camera ${index + 1}, uploading original:`,
-          err,
-        );
-        return buffer;
-      }
+      return Buffer.from(arrayBuffer);
     }),
   );
 }
