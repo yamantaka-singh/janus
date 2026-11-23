@@ -1,10 +1,16 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { StatusCodes } from "http-status-codes";
-import { SESSION_COOKIE_NAME, getSessionUser } from "@/lib/auth";
+import { SESSION_COOKIE_NAME, getSessionUser, SESSION_HEADER_KEYS } from "@/lib/auth";
 
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
+
+  const requestHeaders = new Headers(request.headers);
+  for (const key of SESSION_HEADER_KEYS) {
+    requestHeaders.delete(key);
+  }
+  requestHeaders.delete("x-pathname");
 
   const isPublicAsset =
     pathname.startsWith("/_next") ||
@@ -17,7 +23,11 @@ export async function proxy(request: NextRequest) {
     pathname === "/api/weighments/automatic" && request.method === "POST";
 
   if (isPublicAsset || isPublicAuthApi || isPublicAutomaticIngest) {
-    return NextResponse.next();
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
   }
 
   const isLoginPage = pathname === "/login";
@@ -30,7 +40,6 @@ export async function proxy(request: NextRequest) {
   // Unauthenticated or invalid/expired session
   if (!session) {
     if (isLoginPage) {
-      const requestHeaders = new Headers(request.headers);
       requestHeaders.set("x-pathname", pathname);
       const res = NextResponse.next({
         request: {
@@ -89,7 +98,6 @@ export async function proxy(request: NextRequest) {
     "x-pathname": pathname,
   };
 
-  const requestHeaders = new Headers(request.headers);
   for (const [key, value] of Object.entries(sessionHeaders)) {
     requestHeaders.set(key, value);
   }
